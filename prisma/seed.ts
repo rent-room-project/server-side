@@ -35,9 +35,9 @@ const prisma = new PrismaClient({ datasources: { db: { url } } });
     });
 
     await prisma.lodging.createMany({ data: lodgingPayload as any });
+    await prisma.$disconnect();
   } catch (error) {
     console.log(error);
-  } finally {
     await prisma.$disconnect();
     process.exit(1);
   }
