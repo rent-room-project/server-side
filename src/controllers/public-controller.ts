@@ -51,7 +51,7 @@ export default class PublicController {
 
     try {
       const {
-        query: { typeId, page = 1, perPage },
+        query: { typeId, page = 1, perPage, search },
       } = req;
 
       let take: number = 0;
@@ -62,9 +62,14 @@ export default class PublicController {
         skip = take * Number(page) - take;
       }
 
-      const totalData = await Lodging.count(typeId as string);
+      const totalData = await Lodging.count(typeId as string, search as string);
       const totalPage = Math.ceil(totalData / take);
-      const lodgings = await Lodging.findMany(take, skip, typeId as string);
+      const lodgings = await Lodging.findMany(
+        take,
+        skip,
+        typeId as string,
+        search as string
+      );
 
       res.json({ totalData, totalPage, lodgings });
     } catch (error) {

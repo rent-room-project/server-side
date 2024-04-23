@@ -6,22 +6,30 @@ import {
   lodgingCreateSchema,
   lodgingUpdateSchema,
 } from "../schemas/lodging-schema";
-import History from "./history";
 
 export default class Lodging {
   static client = prisma;
 
-  static async count(TypeId?: string) {
+  static async count(TypeId?: string, search?: string) {
     const option: Record<string, any> = {};
 
     if (TypeId) {
       option.where = { TypeId };
     }
 
+    if (search) {
+      option.where = { name: { equals: `%${search}%`, mode: "insensitive" } };
+    }
+
     return await this.client.lodging.count(option);
   }
 
-  static async findMany(take?: number, skip?: number, TypeId?: string) {
+  static async findMany(
+    take?: number,
+    skip?: number,
+    TypeId?: string,
+    search?: string
+  ) {
     const option: Record<string, any> = {
       select: {
         id: true,
@@ -52,6 +60,10 @@ export default class Lodging {
 
     if (skip) {
       option.skip = skip;
+    }
+
+    if (search) {
+      option.where = { name: { equals: `%${search}%`, mode: "insensitive" } };
     }
 
     return await prisma.lodging.findMany(option);
