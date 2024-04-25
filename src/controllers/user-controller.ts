@@ -40,9 +40,9 @@ export default class UserController {
 
       const payload = cleanNullishValue({ email, password });
 
-      const { access_token, username, role } = await User.login(payload);
+      const result = await User.login(payload);
 
-      res.json({ access_token, email, username, role });
+      res.json(result);
     } catch (error) {
       next(error);
     }

@@ -38,9 +38,9 @@ export default class PublicController {
         body: { email, password },
       } = req;
 
-      const access_token = await User.login({ email, password }, true);
+      const result = await User.login({ email, password }, true);
 
-      res.json({ access_token });
+      res.json(result);
     } catch (error) {
       next(error);
     }
