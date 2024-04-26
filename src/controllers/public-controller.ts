@@ -5,6 +5,7 @@ import Type from "../services/type";
 import Bookmark from "../services/bookmark";
 import { CustomRequest } from "../helpers/types";
 import { NotFoundError } from "@prisma/client/runtime/library";
+import cleanNullishValue from "../helpers/cleanNullishValue";
 
 export default class PublicController {
   static async register(req: Request, res: Response, next: NextFunction) {
@@ -15,7 +16,7 @@ export default class PublicController {
         body: { username, email, password, phoneNumber, address },
       } = req;
 
-      const data = await User.register({
+      const payload = cleanNullishValue({
         username,
         email,
         password,
@@ -23,6 +24,8 @@ export default class PublicController {
         phoneNumber,
         address,
       });
+
+      const data = await User.register(payload);
 
       res.status(201).json(data);
     } catch (error) {
@@ -38,7 +41,9 @@ export default class PublicController {
         body: { email, password },
       } = req;
 
-      const result = await User.login({ email, password }, true);
+      const payload = cleanNullishValue({ email, password });
+
+      const result = await User.login(payload, true);
 
       res.json(result);
     } catch (error) {
