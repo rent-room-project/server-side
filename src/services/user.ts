@@ -62,6 +62,9 @@ export default class User {
     const user = await prisma.user.findUnique({
       where: {
         email: param.email,
+        ...(isCustomer
+          ? { role: "Customer" }
+          : { OR: [{ role: "Admin" }, { role: "Staff" }] }),
       },
     });
 

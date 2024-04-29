@@ -65,11 +65,9 @@ export default class UserController {
 
       const payload = ticket.getPayload();
 
-      const { access_token, email, role, username } = await User.signInGoogle(
-        payload!
-      );
+      const result = await User.signInGoogle(payload!);
 
-      res.json({ access_token, email, username, role });
+      res.json(result);
     } catch (error) {
       next(error);
     }

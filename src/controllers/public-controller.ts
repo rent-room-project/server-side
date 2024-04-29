@@ -6,6 +6,8 @@ import Bookmark from "../services/bookmark";
 import { CustomRequest } from "../helpers/types";
 import { NotFoundError } from "@prisma/client/runtime/library";
 import cleanNullishValue from "../helpers/cleanNullishValue";
+import { OAuth2Client } from "google-auth-library";
+const googleClient = process.env.GOOGLE_CLIENT_ID!;
 
 export default class PublicController {
   static async register(req: Request, res: Response, next: NextFunction) {
@@ -44,6 +46,31 @@ export default class PublicController {
       const payload = cleanNullishValue({ email, password });
 
       const result = await User.login(payload, true);
+
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async googleSignIn(req: Request, res: Response, next: NextFunction) {
+    console.log("public google login api...");
+
+    try {
+      const {
+        headers: { google_token },
+      } = req;
+
+      const client = new OAuth2Client();
+
+      const ticket = await client.verifyIdToken({
+        idToken: google_token as string,
+        audience: googleClient,
+      });
+
+      const payload = ticket.getPayload();
+
+      const result = await User.signInGoogle(payload!, true);
 
       res.json(result);
     } catch (error) {
@@ -114,7 +141,11 @@ export default class PublicController {
     console.log("public list bookmark api...");
 
     try {
-      const bookmarks = await Bookmark.findMany((req as CustomRequest).user.id);
+      const {
+        user: { id: userId },
+      } = req as CustomRequest;
+
+      const bookmarks = await Bookmark.findMany(userId);
 
       res.json(bookmarks);
     } catch (error) {

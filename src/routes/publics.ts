@@ -8,6 +8,8 @@ publics.post("/register", PublicController.register);
 
 publics.post("/login", PublicController.login);
 
+publics.post("/google-login", PublicController.googleSignIn);
+
 publics.get("/lodgings", PublicController.getLodgings);
 
 publics.get("/lodgings/:id", PublicController.getLodgingById);
