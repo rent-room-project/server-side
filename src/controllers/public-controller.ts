@@ -7,7 +7,9 @@ import { CustomRequest } from "../helpers/types";
 import { NotFoundError } from "@prisma/client/runtime/library";
 import cleanNullishValue from "../helpers/cleanNullishValue";
 import { OAuth2Client } from "google-auth-library";
+import * as midtransClient from "midtrans-client";
 const googleClient = process.env.GOOGLE_CLIENT_ID!;
+const midtransServerKey = process.env.MIDTRANS_SERVER_KEY!;
 
 export default class PublicController {
   static async register(req: Request, res: Response, next: NextFunction) {
@@ -121,6 +123,52 @@ export default class PublicController {
 
       res.json(lodging);
     } catch (error) {
+      next(error);
+    }
+  }
+
+  static async generateMidtransToken(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    console.log("payment gateway api...");
+
+    try {
+      const {
+        params: { lodgingId },
+        user: { username, email },
+      } = req as CustomRequest;
+
+      console.log(lodgingId);
+
+      const lodging = await Lodging.findOne(lodgingId);
+
+      const snap = new midtransClient.Snap({
+        isProduction: false,
+        serverKey: midtransServerKey,
+      });
+
+      const param = {
+        transaction_details: {
+          order_id: `ORDER_${
+            Math.floor(Math.random() * (999999 - 100000 + 1)) + 1
+          }`,
+          gross_amount: lodging.price,
+        },
+        credit_card: {
+          secure: true,
+        },
+        customer_details: {
+          first_name: username,
+          email,
+        },
+      };
+
+      const result = await snap.createTransaction(param);
+      res.json(result);
+    } catch (error) {
+      console.log(error);
       next(error);
     }
   }

@@ -10,13 +10,18 @@ publics.post("/login", PublicController.login);
 
 publics.post("/google-login", PublicController.googleSignIn);
 
+publics.get("/types", PublicController.getTypes);
+
 publics.get("/lodgings", PublicController.getLodgings);
 
 publics.get("/lodgings/:id", PublicController.getLodgingById);
 
-publics.get("/types", PublicController.getTypes);
-
 publics.use(isAuthenticated);
+
+publics.post(
+  "/generate-midtrans-token/:lodgingId",
+  PublicController.generateMidtransToken
+);
 
 publics.get("/bookmarks", PublicController.getBookmarks);
 
