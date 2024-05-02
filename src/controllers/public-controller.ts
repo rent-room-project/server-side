@@ -140,8 +140,6 @@ export default class PublicController {
         user: { username, email },
       } = req as CustomRequest;
 
-      console.log(lodgingId);
-
       const lodging = await Lodging.findOne(lodgingId);
 
       const snap = new midtransClient.Snap({
